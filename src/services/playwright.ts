@@ -103,10 +103,27 @@ export async function initPlaywright(headless = true, browserType: BrowserType =
 
   console.log(`[Playwright] Launching ${browserType}...`);
 
+  const args: string[] = [];
+  const ignoreDefaultArgs: string[] = [];
+
+  if (browserType === 'chromium' || browserType === 'chrome' || browserType === 'edge') {
+    args.push('--disable-blink-features=AutomationControlled');
+    ignoreDefaultArgs.push('--enable-automation');
+  }
+
   context = await browserEngine.launchPersistentContext(profilePath, {
     headless,
     channel,
+    args,
+    ignoreDefaultArgs,
     userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  });
+
+  // Hide webdriver property from navigator
+  await context.addInitScript(() => {
+    Object.defineProperty(navigator, 'webdriver', {
+      get: () => undefined,
+    });
   });
 
   // Keep an active page to fetch headers on demand

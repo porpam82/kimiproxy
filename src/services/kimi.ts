@@ -102,7 +102,7 @@ export async function createKimiStream(
   }
 
   // Active search tool
-  payload.tools = [{ type: 'TOOL_TYPE_SEARCH', search: {} }];
+  //payload.tools = [{ type: 'TOOL_TYPE_SEARCH', search: {} }];
 
   if (modelConfig.kimiPlusId) {
     payload.kimi_plus_id = modelConfig.kimiPlusId;
