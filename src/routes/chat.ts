@@ -44,7 +44,8 @@ class ConnectStreamParser {
           console.error("Failed to parse Connect JSON:", e, jsonStr);
         }
       } else if (flags === 0x02) {
-        console.log("[ConnectStreamParser] End of stream trailers.");
+        const trailersStr = textDecoder.decode(payload);
+        console.log("[ConnectStreamParser] End of stream trailers:", trailersStr);
       }
     }
 
@@ -244,7 +245,7 @@ export async function chatCompletions(c: Context) {
     let retries = 3;
     while (retries > 0) {
       try {
-        const result = await createKimiStream(finalPrompt, isThinkingModel, body.model, isNewSession ? null : undefined);
+        const result = await createKimiStream(finalPrompt, isThinkingModel, body.model, null, null);
         stream = result.stream;
         uiSessionId = result.uiSessionId;
         break; // Success
@@ -287,7 +288,7 @@ export async function chatCompletions(c: Context) {
           let nextStream: ReadableStream | null = null;
           while (retries > 0) {
             try {
-              const result = await createKimiStream('continue', isThinkingModel, body.model, undefined);
+              const result = await createKimiStream('continue', isThinkingModel, body.model, undefined, currentUiSessionId);
               nextStream = result.stream;
               currentUiSessionId = result.uiSessionId;
               break;
@@ -499,7 +500,7 @@ export async function chatCompletions(c: Context) {
           let nextStream: ReadableStream | null = null;
           while (retries > 0) {
             try {
-              const result = await createKimiStream('continue', isThinkingModel, body.model, undefined);
+              const result = await createKimiStream('continue', isThinkingModel, body.model, undefined, currentUiSessionId);
               nextStream = result.stream;
               currentUiSessionId = result.uiSessionId;
               break;

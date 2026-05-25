@@ -62,12 +62,19 @@ export async function createKimiStream(
   prompt: string,
   enableThinking: boolean,
   modelId: string,
-  forcedParentId?: string | null
+  forcedParentId?: string | null,
+  forcedChatId?: string | null
 ): Promise<{ stream: ReadableStream, headers: Record<string, string>, uiSessionId: string }> {
-  const { headers, chatSessionId, parentMessageId } = await getKimiHeaders(forcedParentId === null);
+  const { headers, chatSessionId, parentMessageId } = await getKimiHeaders(forcedParentId === null && !forcedChatId);
 
   let actualParentId: string | null = parentMessageId;
   let activeChatId = chatSessionId;
+
+  if (forcedChatId !== undefined && forcedChatId !== null) {
+    activeChatId = forcedChatId;
+  } else if (forcedParentId === null) {
+    activeChatId = ''; // Force new chat
+  }
 
   if (forcedParentId !== undefined) {
     actualParentId = forcedParentId;
