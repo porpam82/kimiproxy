@@ -290,13 +290,7 @@ async function _getKimiHeadersInternal(forceNew = false): Promise<{ headers: Rec
             console.log(`[Playwright] Attempting click on: ${selector}`);
             
             // Try both DOM click and Playwright click
-            await activePage!.evaluate((sel) => {
-              const element = document.querySelector(sel) as HTMLElement;
-              if (element) {
-                element.focus();
-                element.click();
-              }
-            }, selector);
+            await page.click('svg.send-icon');
             
             // Also try a real mouse click just in case
             await btn.click({ force: true, delay: 50 }).catch(() => {});
