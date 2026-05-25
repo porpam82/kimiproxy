@@ -184,6 +184,22 @@ async function _getKimiHeadersInternal(forceNew = false): Promise<{ headers: Rec
   if (!isOnKimi || forceNew) {
     console.log(`[Playwright] Navigating to Kimi home... (Current: ${currentUrl})`);
     await activePage.goto('https://www.kimi.com/', { waitUntil: 'domcontentloaded' });
+    
+    // Inject token if available via env var (for headless servers like Coolify)
+    if (process.env.KIMI_REFRESH_TOKEN) {
+      const injected = await activePage.evaluate((token) => {
+        if (localStorage.getItem('refresh_token') !== token) {
+          localStorage.setItem('refresh_token', token);
+          return true;
+        }
+        return false;
+      }, process.env.KIMI_REFRESH_TOKEN);
+      
+      if (injected) {
+        console.log('[Playwright] Injected KIMI_REFRESH_TOKEN. Reloading page...');
+        await activePage.reload({ waitUntil: 'domcontentloaded' });
+      }
+    }
   }
 
   // Wait for the textarea
